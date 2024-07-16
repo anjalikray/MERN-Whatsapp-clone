@@ -2,6 +2,9 @@ import { Dialog, Box, Typography, List, ListItem, styled } from "@mui/material";
 import { qrCodeImage } from "../../constants/data";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
+import { useContext } from "react";
+
+import { AccountContext } from "../../context/AccountProvider";
 
 const dialogStyled = {
     height: "90%",
@@ -11,6 +14,7 @@ const dialogStyled = {
     maxHeight: "100%",
     boxShadow: "none",
     overflow: "hidden",
+    backgroundColor: "none",
 };
 
 const Component = styled(Box)`
@@ -43,19 +47,26 @@ const StyledList = styled(List)`
     }
 `;
 
-const onLoginSuccess = (res) => {
-    const decoded = jwtDecode(res.credential)
-    console.log(decoded)
-}
-
-const onLoginError = (res) => {
-    console.log("Login Failed" ,res)
-}
-
 const LoginDialog = () => {
+    const { setAccount } = useContext(AccountContext);
+
+    const onLoginSuccess = (res) => {
+        const decoded = jwtDecode(res.credential);
+        // console.log(decoded);
+        setAccount(decoded);
+    };
+
+    const onLoginError = (res) => {
+        console.log("Login Failed", res);
+    };
+    
     return (
         <div>
-            <Dialog open={true} PaperProps={{ sx: dialogStyled }}>
+            <Dialog
+                open={true}
+                PaperProps={{ sx: dialogStyled }}
+                hideBackdrop={true}
+            >
                 <Component>
                     <Container>
                         <Title>To use WhatsApp on your computer:</Title>
@@ -74,10 +85,16 @@ const LoginDialog = () => {
                         </StyledList>
                     </Container>
 
-                    <Box style={{position: "relative"}}>
+                    <Box style={{ position: "relative" }}>
                         <QRCode src={qrCodeImage} alt="barCode" />
 
-                        <Box style={{position: "absolute", top: "50%" , transform: "translateX(50%)"}}>
+                        <Box
+                            style={{
+                                position: "absolute",
+                                top: "50%",
+                                transform: "translateX(40%)",
+                            }}
+                        >
                             <GoogleLogin
                                 onSuccess={onLoginSuccess}
                                 onError={onLoginError}
