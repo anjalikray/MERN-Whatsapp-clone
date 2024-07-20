@@ -9,7 +9,7 @@ const MenuOption = styled(MenuItem)`
 
 `     
 
-const HeaderMenu = () => {
+const HeaderMenu = ({setOpen}) => {
     const [openMenu, setOpenMenu] = useState(false);
 
     const handleOpen = (e) => {
@@ -38,11 +38,7 @@ const HeaderMenu = () => {
                     horizontal: "right",
                 }}
             >
-                <MenuOption onClick={handleClose}>Profile</MenuOption>
-                <MenuOption onClick={handleClose}>New Group</MenuOption>
-                <MenuOption onClick={handleClose}>Archived</MenuOption>
-                <MenuOption onClick={handleClose}>Starred Messages</MenuOption>
-                <MenuOption onClick={handleClose}>Setting</MenuOption>
+                <MenuOption onClick={() =>{handleClose(); setOpen(true)}}>Profile</MenuOption>
             </Menu>
         </>
     );
