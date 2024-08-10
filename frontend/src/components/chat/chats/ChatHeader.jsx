@@ -38,12 +38,12 @@ const Status = styled(Typography)`
     margin-left: 12px !important;
 `;
 
-const ChatHeader = () => {
+const ChatHeader = ({person}) => {
     return (
         <Header>
-            <Image src={defaultProfilePicture} alt="dp" />
+            <Image src={person.picture} alt="dp" />
             <Box>
-                <Name>name</Name>
+                <Name>{person.name}</Name>
                 <Status>status</Status>
             </Box>
 
