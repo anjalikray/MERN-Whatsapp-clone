@@ -1,6 +1,6 @@
 import Conversation from "../model/conversation-model.js";
 
-export const getConversation = async (req, res) => {
+export const newConversation = async (req, res) => {
      try {
           const senderId = req.body.senderId;
           const receiverId = req.body.receiverId;
@@ -23,3 +23,15 @@ export const getConversation = async (req, res) => {
           return res.status(500).json(error.message);
      }
 } 
+
+export const getConversation = async (req, res) => {
+     try {
+          const senderId = req.body.senderId;
+          const receiverId = req.body.receiverId;
+          
+          let conversation = await Conversation.findOne({ members: {$all: [receiverId ,senderId ]} })
+          return res.status(200).json(conversation)
+     } catch (error) {
+          return res.status(500).json(error.message);
+     }
+}

@@ -33,14 +33,19 @@ const ClipIcon = styled(AttachFile)`
     transform: rotate(40deg);
 `;
 
-const ChatFooter = () => {
+const ChatFooter = ({ sendText, setValue , value}) => {
     return (
         <Container>
             <EmojiEmotions />
             <ClipIcon />
 
             <Search>
-                <InputField placeholder="Type a message" />
+                <InputField
+                    placeholder="Type a message"
+                    onChange={(e) => setValue(e.target.value)}
+                    onKeyDown={(e) => sendText(e)}
+                    value={value}
+                />
             </Search>
 
             <Mic />
