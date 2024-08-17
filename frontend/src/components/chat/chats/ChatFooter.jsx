@@ -1,6 +1,10 @@
 import { EmojiEmotions, AttachFile, Mic } from "@mui/icons-material";
 import { Box, styled, InputBase } from "@mui/material";
 
+import { useEffect } from "react";
+
+import { uploadFile } from "../../../service/api";
+
 const Container = styled(Box)`
     height: 55px;
     background: #ededed;
@@ -33,11 +37,38 @@ const ClipIcon = styled(AttachFile)`
     transform: rotate(40deg);
 `;
 
-const ChatFooter = ({ sendText, setValue , value}) => {
+const ChatFooter = ({ sendText, setValue, value, file, setFile }) => {
+    useEffect(() => {
+        const getFile = async () => {
+            if (file) {
+                const data = new FormData();
+                data.append("name", file.name);
+                data.append("file", file);
+
+                await uploadFile(data);
+            }
+        };
+        getFile();
+    }, [file]);
+
+    const onFileChange = (e) => {
+        setFile(e.target.files[0]);
+        setValue(e.target.files[0].name);
+    };
+
     return (
         <Container>
             <EmojiEmotions />
-            <ClipIcon />
+            <label htmlFor="fileInput">
+                <ClipIcon />
+            </label>
+
+            <input
+                type="file"
+                style={{ display: "none" }}
+                id="fileInput"
+                onChange={(e) => onFileChange(e)}
+            />
 
             <Search>
                 <InputField
