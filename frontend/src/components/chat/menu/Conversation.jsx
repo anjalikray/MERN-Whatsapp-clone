@@ -1,8 +1,10 @@
 import { Box, Typography , styled} from "@mui/material";
-import {useContext} from "react" 
+import {useContext , useEffect , useState} from "react" 
 
 import { AccountContext } from "../../../context/AccountProvider";
-import { setConversation } from "../../../service/api";
+import { setConversation , getConversation } from "../../../service/api";
+
+import { formateDate } from "../../../utils/commonUtils";
 
 const Component = styled(Box)`
     height: 45px;
@@ -38,12 +40,22 @@ const Text = styled(Typography)`
 
 const Conversation = ({ user }) => {
 
-    const { setPerson , account } = useContext(AccountContext)
+    const { setPerson , account , newMessageFlag } = useContext(AccountContext)
+
+    const [message , setMessage] = useState({})
 
     const getUser = async () => {
         setPerson(user)
         await setConversation({senderId: account.sub , receiverId: user.sub})
     }
+
+    useEffect(() => {
+        const getConversationDetails = async () => {
+            const data = await getConversation({ senderId: account.sub , receiverId : user.sub })
+            setMessage({ text: data?.message , timeStamp: data.updatedAt })
+        }
+        getConversationDetails()
+    } , [newMessageFlag])
 
     return (
         <Component onClick={() => getUser()}>
@@ -51,9 +63,19 @@ const Conversation = ({ user }) => {
                <Image src={user.picture} alt="dp" />
             </Box>
 
-            <Box>
-               <Box>
+            <Box style={{width: '100%'}}>
+               <Container>
                     <Typography>{user.name}</Typography>
+                    {
+                        message?.text && 
+                            <Timestamp>{formateDate(message?.timeStamp)}</Timestamp> 
+                    }
+               </Container>
+
+               <Box>
+                    <Text>
+                        {message?.text?.includes('localhost') ? 'media' : message.text}
+                    </Text>
                </Box>
             </Box>
         </Component>

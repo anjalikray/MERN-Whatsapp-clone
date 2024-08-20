@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { Box, styled } from "@mui/material";
 
 import { AccountContext } from "../../../context/AccountProvider";
@@ -30,13 +30,31 @@ const Container = styled(Box)`
 `;
 
 const ChatMessages = ({ person, conversation }) => {
-    const { account } = useContext(AccountContext);
+    const { account, socket , setNewMessageFlag , newMessageFlag} = useContext(AccountContext);
 
     const [value, setValue] = useState("");
     const [messages, setMessages] = useState([]);
-    const [newMessageFlag, setNewMessageFlag] = useState(false);
     const [file, setFile] = useState();
-    const [image , setImage] = useState('')
+    const [image, setImage] = useState("");
+    const [incomingMsg, setImcomingMsg] = useState(null);
+
+    const scrollRef = useRef();
+
+    useEffect(() => {
+        socket.current.on("getMessage", (data) => {
+            setImcomingMsg({
+                ...data,
+                createdAt: Date.now(),
+            });
+        });
+    }, []);
+
+    useEffect(() => {
+        scrollRef.current?.scrollIntoView({
+            transition: "smooth",
+            behavior: "smooth",
+        });
+    }, [messages]);
 
     useEffect(() => {
         const getMessageDetails = async () => {
@@ -45,6 +63,12 @@ const ChatMessages = ({ person, conversation }) => {
         };
         conversation._id && getMessageDetails();
     }, [person._id, conversation._id, newMessageFlag]);
+
+    useEffect(() => {
+        incomingMsg &&
+            conversation?.members?.includes(incomingMsg.senderId) &&
+            setMessages((prev) => [...prev, incomingMsg]);
+    }, [incomingMsg, conversation]);
 
     const sendText = async (e) => {
         const code = e.keyCode || e.which;
@@ -70,11 +94,13 @@ const ChatMessages = ({ person, conversation }) => {
                 };
             }
 
+            socket.current.emit("sendMessage", message);
+
             await newMessage(message);
 
             setValue("");
-            setFile('')
-            setImage('')
+            setFile("");
+            setImage("");
             setNewMessageFlag((prev) => !prev);
         }
     };
@@ -85,7 +111,7 @@ const ChatMessages = ({ person, conversation }) => {
                 <Component>
                     {messages &&
                         messages.map((message) => (
-                            <Container>
+                            <Container ref={scrollRef}>
                                 <MessageSingle message={message} />
                             </Container>
                         ))}
@@ -97,7 +123,7 @@ const ChatMessages = ({ person, conversation }) => {
                     value={value}
                     file={file}
                     setFile={setFile}
-                    setImage = {setImage}
+                    setImage={setImage}
                 />
             </Wrapper>
         </>

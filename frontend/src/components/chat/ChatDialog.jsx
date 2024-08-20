@@ -38,10 +38,10 @@ const ChatDialog = () => {
     return (
         <>
             <Dialog
-                max-width={'md'}
-                open={true}
+                open={true} 
+                BackdropProps={{style: {backgroundColor: 'unset'}}}
                 PaperProps={{ sx: dialogStyled }}
-                hideBackdrop={true}
+                maxWidth={'md'}
             >
                 <Component>
 
